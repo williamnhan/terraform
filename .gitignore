@@ -2,4 +2,4 @@ azurerm/.terraform.*
 azurerm/.terraform/*
 azurerm/terraform.tfstate
 azurerm/terraform.tfstate.backup
-azurerm/workspace.code-workspace
+workspace.code-workspace
