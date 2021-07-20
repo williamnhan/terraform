@@ -78,6 +78,7 @@ resource "azurerm_windows_virtual_machine" "web_server" {
   location = var.web_server_location
   resource_group_name = azurerm_resource_group.web_server_rg.name
   network_interface_ids = [azurerm_network_interface.web_server_nic.id]
+  availability_set_id = azurerm_availability_set.web_server_availability_set.id
   size = "Standard_B1s"
   admin_username = "webserver"
   admin_password = "Passw0rd321"
@@ -92,4 +93,12 @@ resource "azurerm_windows_virtual_machine" "web_server" {
     sku = "Datacenter-Core-1709-smalldisk"
     version = "latest"
   }
+}
+
+resource "azurerm_availability_set" "web_server_availability_set" {
+  name = "${var.resource_prefix}-availability-set"
+  location = var.web_server_location
+  resource_group_name = azurerm_resource_group.web_server_rg.name
+  managed = true
+  platform_fault_domain_count = 2
 }
