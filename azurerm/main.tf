@@ -94,7 +94,6 @@ resource "azurerm_network_security_rule" "web_server_nsg_rule_http" {
   destination_address_prefix = "*"
   resource_group_name = azurerm_resource_group.web_server_rg.name
   network_security_group_name = azurerm_network_security_group.web_server_nsg.name
-  count = var.enviroment == "production" ? 0 : 1
 }
 
 resource "azurerm_subnet_network_security_group_association" "web_server_nsg_association" {
@@ -189,8 +188,8 @@ resource "azurerm_virtual_machine_scale_set" "web_server" {
     type_handler_version = "1.10"
 
     settings = jsonencode({
-      "fileUri" : ["https://raw.githubusercontent.com/williamnhan/terraform/master/azurerm/azureInstallWebServer.ps1"],
-      "commandToExecute" : "start powershell -ExecutionPolocy Unretricted -File azureInstallWebServer.ps1"
+      "fileUris" : ["https://raw.githubusercontent.com/williamnhan/terraform/master/azurerm/azureInstallWebServer.ps1"],
+      "commandToExecute" : "start powershell -ExecutionPolicy Unrestricted -File azureInstallWebServer.ps1"
     })
   }
 }
