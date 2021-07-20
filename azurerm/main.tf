@@ -22,13 +22,6 @@ resource "azurerm_virtual_network" "web_server_vnet" {
   address_space = [var.web_server_address_space]
 }
 
-# resource "azurerm_subnet" "web_server_subnet" {
-#   name = "${var.resource_prefix}-subnet"
-#   resource_group_name = azurerm_resource_group.web_server_rg.name
-#   virtual_network_name = azurerm_virtual_network.web_server_vnet.name
-#   address_prefixes = [var.web_server_address_prefix]
-# }
-
 resource "azurerm_subnet" "web_server_subnet" {
   for_each = var.web_server_subnet
     name = each.key
@@ -41,7 +34,8 @@ resource "azurerm_network_interface" "web_server_nic" {
   name = "${var.web_server_name}-${format("%02d", count.index)}-nic"
   location = var.web_server_location
   resource_group_name = azurerm_resource_group.web_server_rg.name
-  count = var.web_server_count
+  # count = var.web_server_count
+  count = 0
 
   ip_configuration {
     name = "${var.web_server_name}-ip"
@@ -84,13 +78,22 @@ resource "azurerm_subnet_network_security_group_association" "web_server_nsg_ass
   subnet_id = azurerm_subnet.web_server_subnet["web-server"].id
 }
 
+# // Get Image list and size from Azure
+# az vm image list -o table
+# az vm image list-offers -l westus2 --output table
+# az vm image list-offers -l westus2 -p MicrosoftWindowsServer -o table
+# az vm list-sizes -l westus2 -o table
+# az vm image list-offers -l westus2 -p MicrosoftWindowsServer -o table
+
 resource "azurerm_windows_virtual_machine" "web_server" {
   name = "${var.web_server_name}-${format("%02d", count.index)}"
   location = var.web_server_location
   resource_group_name = azurerm_resource_group.web_server_rg.name
   network_interface_ids = [azurerm_network_interface.web_server_nic[count.index].id]
-  availability_set_id = azurerm_availability_set.web_server_availability_set.id
-  count = var.web_server_count
+  # availability_set_id = azurerm_availability_set.web_server_availability_set.id
+  # count = var.web_server_count
+  count = 0
+
   size = "Standard_B1s"
   admin_username = "webserver"
   admin_password = "Passw0rd321"
@@ -105,11 +108,52 @@ resource "azurerm_windows_virtual_machine" "web_server" {
     version = "latest"
   }
 }
-
-resource "azurerm_availability_set" "web_server_availability_set" {
-  name = "${var.resource_prefix}-availability-set"
+resource "azurerm_virtual_machine_scale_set" "web_server" {
+  name = "${var.web_server_name}-scale-set"
   location = var.web_server_location
   resource_group_name = azurerm_resource_group.web_server_rg.name
-  managed = true
-  platform_fault_domain_count = 2
+  upgrade_policy_mode = "manual"
+
+  sku {
+    name = "Standard_B1s"
+    tier = "Standard"
+    capacity = var.web_server_count
+  }
+  storage_profile_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer = "WindowsServerSemiAnnual"
+    sku = "Datacenter-Core-1709-smalldisk"
+    version = "latest"
+  }
+  storage_profile_os_disk {
+    name = ""
+    caching = "ReadWrite"
+    create_option = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+  os_profile {
+    computer_name_prefix = var.web_server_name
+    admin_username = "webserver"
+    admin_password = "Passw0rd321"
+  }
+  os_profile_windows_config {
+    provision_vm_agent = true
+  }
+  network_profile {
+    name = "web_server_network_profile"
+    primary = true
+    ip_configuration {
+      name = var.web_server_name
+      primary = true
+      subnet_id = azurerm_subnet.web_server_subnet["web-server"].id
+    }
+  }
 }
+
+# resource "azurerm_availability_set" "web_server_availability_set" {
+#   name = "${var.resource_prefix}-availability-set"
+#   location = var.web_server_location
+#   resource_group_name = azurerm_resource_group.web_server_rg.name
+#   managed = true
+#   platform_fault_domain_count = 2
+# }
