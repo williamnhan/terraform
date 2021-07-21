@@ -60,6 +60,7 @@ resource "azurerm_public_ip" "web_server_lb_public_ip" {
   location = var.web_server_location
   resource_group_name = azurerm_resource_group.web_server_rg.name
   allocation_method = var.environment == "production" ? "Static" : "Dynamic"
+  domain_name_label = var.domain_name_lable
 }
 
 resource "azurerm_network_security_group" "web_server_nsg" {

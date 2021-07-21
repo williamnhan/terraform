@@ -16,3 +16,6 @@ variable "web_server_count" {
 variable "terraform_script_version" {
   type = string
 }
+variable "domain_name_lable" {
+  type = string
+}
