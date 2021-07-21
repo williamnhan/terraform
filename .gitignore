@@ -5,4 +5,4 @@ azurerm/terraform.tfstate.backup
 workspace.code-workspace
 .terraform
 */.terraform
-*/.terraform.lock.hcl
+*/*/.terraform.lock.hcl
