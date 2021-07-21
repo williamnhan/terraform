@@ -1,15 +1,3 @@
-terraform {
-  required_providers {
-    azurerm = {
-      source = "hashicorp/azurerm"
-      version = "2.68.0"
-    }
-  }
-}
-provider "azurerm" {
-  features {}
-}
-
 locals {
   web_server_name = var.environment == "production" ? "${var.web_server_name}-prd" : "${var.web_server_name}-dev"
   build_environment = var.environment == "production" ? "production" : "development"
