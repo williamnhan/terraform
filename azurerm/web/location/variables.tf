@@ -24,6 +24,10 @@ variable "web_server_subnet" {
 }
 variable "terraform_script_version" {
   type = string
+  validation {
+    condition = can(regex("\\d\\.\\d\\.\\d", var.terraform_script_version))
+    error_message = "The variable terraform_script_version must be in format x.x.x ."
+  }
 }
 variable "admin_password" {
   type = string

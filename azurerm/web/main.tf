@@ -5,9 +5,11 @@ terraform {
       version = "2.68.0"
     }
     random = {
+      source = "hashicorp/random"
       version = "2.2"
     }
   }
+  required_version = ">= 0.13"
 }
 provider "azurerm" {
   features {}
@@ -54,36 +56,36 @@ module "location_us2w" {
 #   domain_name_lable         = var.domain_name_lable
 # }
 
-resource "azurerm_resource_group" "global_rg" {
-  name = "traffic-manager-rg"
-  location = "westus2"
-}
+# resource "azurerm_resource_group" "global_rg" {
+#   name = "traffic-manager-rg"
+#   location = "westus2"
+# }
 
-resource "azurerm_traffic_manager_profile" "traffic_manager" {
-  name = "${var.resource_prefix}-traffic-manager"
-  resource_group_name = azurerm_resource_group.global_rg.name
-  traffic_routing_method = "Weighted"
+# resource "azurerm_traffic_manager_profile" "traffic_manager" {
+#   name = "${var.resource_prefix}-traffic-manager"
+#   resource_group_name = azurerm_resource_group.global_rg.name
+#   traffic_routing_method = "Weighted"
 
-  dns_config {
-    relative_name = var.domain_name_lable
-    ttl = 100
-  }
+#   dns_config {
+#     relative_name = var.domain_name_lable
+#     ttl = 100
+#   }
 
-  monitor_config {
-    protocol = "http"
-    port = 80
-    path = "/"
-  }
-}
+#   monitor_config {
+#     protocol = "http"
+#     port = 80
+#     path = "/"
+#   }
+# }
 
-resource "azurerm_traffic_manager_endpoint" "traffic_manager_us2w" {
-  name = "${var.resource_prefix}-us2w-endpoint"
-  resource_group_name = azurerm_resource_group.global_rg.name
-  profile_name = azurerm_traffic_manager_profile.traffic_manager.name
-  target_resource_id = module.location_us2w.web_server_lb_public_ip_id
-  type = "azureEndpoints"
-  weight = 100
-}
+# resource "azurerm_traffic_manager_endpoint" "traffic_manager_us2w" {
+#   name = "${var.resource_prefix}-us2w-endpoint"
+#   resource_group_name = azurerm_resource_group.global_rg.name
+#   profile_name = azurerm_traffic_manager_profile.traffic_manager.name
+#   target_resource_id = module.location_us2w.web_server_lb_public_ip_id
+#   type = "azureEndpoints"
+#   weight = 100
+# }
 
 # resource "azurerm_traffic_manager_endpoint" "traffic_manager_us2e" {
 #   name = "${var.resource_prefix}-us2e-endpoint"

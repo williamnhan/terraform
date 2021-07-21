@@ -3,3 +3,6 @@ azurerm/.terraform/*
 azurerm/terraform.tfstate
 azurerm/terraform.tfstate.backup
 workspace.code-workspace
+.terraform
+*/.terraform
+*/.terraform.lock.hcl
