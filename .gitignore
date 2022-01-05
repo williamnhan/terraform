@@ -6,3 +6,4 @@ workspace.code-workspace
 .terraform
 */.terraform
 */*/.terraform.lock.hcl
+google/credentials/*
